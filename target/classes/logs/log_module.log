@@ -13,3 +13,9 @@ java.sql.SQLException: No suitable driver found for jdbc:mysql://localhost:3306/
 2020-06-29 15:18:51 DEBUG ConnectionPoolImpl:61 - Connection created
 2020-06-29 15:18:51 DEBUG ConnectionPoolImpl:61 - Connection created
 2020-06-29 15:18:51 DEBUG ConnectionPoolImpl:89 - Connection acquired
+2020-06-29 15:19:44 DEBUG ConnectionPoolImpl:62 - Connection created
+2020-06-29 15:19:44 DEBUG ConnectionPoolImpl:62 - Connection created
+2020-06-29 15:19:44 DEBUG ConnectionPoolImpl:62 - Connection created
+2020-06-29 15:19:44 DEBUG ConnectionPoolImpl:62 - Connection created
+2020-06-29 15:19:44 DEBUG ConnectionPoolImpl:62 - Connection created
+2020-06-29 15:19:44 DEBUG ConnectionPoolImpl:90 - Connection acquired
