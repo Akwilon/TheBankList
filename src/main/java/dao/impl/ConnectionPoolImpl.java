@@ -20,8 +20,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ConnectionPoolImpl implements ConnectionPool {
     private static final Logger LOGGER = Logger.getLogger(ConnectionPoolImpl.class);
     private static volatile ConnectionPoolImpl instance;
-
-
     private static String url = "jdbc:mysql://localhost/test?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
     private static String login = "root";
     private static String password = "admin";
@@ -34,14 +32,14 @@ public class ConnectionPoolImpl implements ConnectionPool {
     private AtomicInteger currentPoolSize;
 
 
-    private ConnectionPoolImpl(String url, String login, String password) throws ConnectionPoolException, InterruptedException {
+    private ConnectionPoolImpl(String url, String login, String password) throws ConnectionPoolException, InterruptedException, ClassNotFoundException {
         ConnectionPoolImpl.url = url;
         ConnectionPoolImpl.login = login;
         ConnectionPoolImpl.password = password;
         initializePool(startPoolSize, maxPoolSize);
     }
 
-    public static ConnectionPoolImpl getInstance() throws ConnectionPoolException, InterruptedException {
+    public static ConnectionPoolImpl getInstance() throws ConnectionPoolException, InterruptedException, ClassNotFoundException {
         ConnectionPoolImpl localInstance = instance;
         if (localInstance == null) {
             synchronized (ConnectionPoolImpl.class) {
@@ -55,7 +53,8 @@ public class ConnectionPoolImpl implements ConnectionPool {
     }
 
 
-    private Connection createConnection() throws ConnectionPoolException {
+    private Connection createConnection() throws ConnectionPoolException, ClassNotFoundException {
+        Class.forName("com.mysql.jdbc.Driver");
         try {
             Connection connection = DriverManager.getConnection(url, login, password);
             allConnections.add(connection);
@@ -68,7 +67,7 @@ public class ConnectionPoolImpl implements ConnectionPool {
         }
     }
 
-    private void initializePool(int startPoolSize, int maxPoolSize) throws ConnectionPoolException, InterruptedException {
+    private void initializePool(int startPoolSize, int maxPoolSize) throws ConnectionPoolException, InterruptedException, ClassNotFoundException {
         allConnections = new CopyOnWriteArrayList<>();
         freeConnections = new LinkedBlockingQueue<>(maxPoolSize);
         currentPoolSize = new AtomicInteger(startPoolSize);
@@ -79,7 +78,7 @@ public class ConnectionPoolImpl implements ConnectionPool {
     }
 
 
-    public Connection acquireConnection() throws ConnectionPoolException, ConnectionPoolNotInitializedException {
+    public Connection acquireConnection() throws ConnectionPoolException, ConnectionPoolNotInitializedException, ClassNotFoundException {
         Connection connection = null;
         try {
             connection = freeConnections.poll();
@@ -100,20 +99,23 @@ public class ConnectionPoolImpl implements ConnectionPool {
     public void releaseConnection(Connection connection) {
         try {
             connection.close();
+            freeConnections.put(connection);
         } catch (SQLException ex) {
             LOGGER.warn("Connection to database was not properly closed, causing memory leak", ex);
+        } catch (InterruptedException e) {
+            LOGGER.error("Thread was interrupted while trying to release connection to connection pool", e);
         }
     }
 
     public static void setUrl(String uri) {
-        url = uri;
+        ConnectionPoolImpl.url = uri;
     }
 
-    public void setLogin(String login1) {
-        login = login1;
+    public static void setLogin(String login1) {
+        ConnectionPoolImpl.login = login1;
     }
 
-    public void setPassword(String password1) {
-        password = password1;
+    public static void setPassword(String password1) {
+        ConnectionPoolImpl.password = password1;
     }
 }

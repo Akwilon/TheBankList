@@ -6,7 +6,7 @@ public interface ConnectionPool {
 
 
 
-    Connection acquireConnection() throws ConnectionPoolException, ConnectionPoolNotInitializedException;
+    Connection acquireConnection() throws ConnectionPoolException, ConnectionPoolNotInitializedException, ClassNotFoundException;
 
 
     void releaseConnection(Connection connection);

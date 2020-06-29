@@ -11,12 +11,12 @@ import java.util.List;
 public class Main {
 
         public static void main(String... args) throws ConnectionPoolException, InterruptedException, ConnectionPoolNotInitializedException, SQLException, ClassNotFoundException {
-                Class.forName("com.mysql.jdbc.Driver");
                 String uri  = "jdbc:mysql://localhost/test?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
                 String USER = "root";
                 String PASSWORD = "admin";
 
-                Connection connection = ConnectionPoolImpl.getInstance().acquireConnection();
+                ConnectionPoolImpl connectionPool = ConnectionPoolImpl.getInstance();
+                Connection connection = connectionPool.acquireConnection();
 
                 List<Account> accountData = new ArrayList<>();
 
@@ -33,13 +33,8 @@ public class Main {
                         }
                 } catch (SQLException throwables) {
                         throwables.printStackTrace();
-                } finally {
-                        try {
-                                connection.close();
-                        } catch (SQLException throwables) {
-                                throwables.printStackTrace();
-                        }
                 }
+                connectionPool.releaseConnection(connection);
                 System.out.println(accountData);
         }
 
