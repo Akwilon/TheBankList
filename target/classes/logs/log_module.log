@@ -1,0 +1,15 @@
+2020-06-29 15:08:22 FATAL ConnectionPoolImpl:65 - Failed to create connection
+java.sql.SQLException: No suitable driver found for jdbc:mysql://localhost:3306/test?useLegacyDatetimeCode=false&amp;serverTimezone=UTC
+	at java.sql.DriverManager.getConnection(DriverManager.java:689)
+	at java.sql.DriverManager.getConnection(DriverManager.java:247)
+	at dao.impl.ConnectionPoolImpl.createConnection(ConnectionPoolImpl.java:59)
+	at dao.impl.ConnectionPoolImpl.initializePool(ConnectionPoolImpl.java:75)
+	at dao.impl.ConnectionPoolImpl.<init>(ConnectionPoolImpl.java:40)
+	at dao.impl.ConnectionPoolImpl.getInstance(ConnectionPoolImpl.java:49)
+	at Main.main(Main.java:17)
+2020-06-29 15:18:51 DEBUG ConnectionPoolImpl:61 - Connection created
+2020-06-29 15:18:51 DEBUG ConnectionPoolImpl:61 - Connection created
+2020-06-29 15:18:51 DEBUG ConnectionPoolImpl:61 - Connection created
+2020-06-29 15:18:51 DEBUG ConnectionPoolImpl:61 - Connection created
+2020-06-29 15:18:51 DEBUG ConnectionPoolImpl:61 - Connection created
+2020-06-29 15:18:51 DEBUG ConnectionPoolImpl:89 - Connection acquired
