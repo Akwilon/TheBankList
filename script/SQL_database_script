@@ -1,0 +1,54 @@
+create schema test;
+
+CREATE TABLE test.user (
+  userID INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(45) NULL,
+  surname VARCHAR(45) NULL,
+  PRIMARY KEY (userID));
+
+
+
+CREATE TABLE test.account (
+  accountID INT NOT NULL AUTO_INCREMENT,
+  account INT NULL,
+  userID INT NULL,
+  PRIMARY KEY (accountID),
+  CONSTRAINT userID
+    FOREIGN KEY (userID)
+    REFERENCES test.user (userID)
+)
+
+
+	
+insert into test.user values ('2', 'Vasiliy', 'Petrov');
+insert into test.user values ('3', 'Ekaterina', 'Novikova');
+insert into test.user values ('4', 'Ulyana', 'Morozova');
+insert into test.user values ('5', 'Pavel', 'Verbitskiy');
+insert into test.user values ('6', 'Stanislav', 'Gerasimonko');
+insert into test.user values ('7', 'Vadim', 'Suhanov');
+insert into test.user values ('8', 'Stas', 'Suhanov');
+insert into test.user values ('9', 'Artur', 'Pranovich');
+insert into test.user values ('10', 'Evgeniy', 'Mukovozchik');
+insert into test.user values ('11', 'Aleksey', 'Dolmatov');
+insert into test.user values ('12', 'Yana', 'Lesnitskaya');
+insert into test.user values ('13', 'Dmitriy', 'Gordon');
+
+
+insert into test.account values ('1', '10', '1');
+insert into test.account values ('2', '154', '2');
+insert into test.account values ('3', '125', '3');
+insert into test.account values ('4', '1556', '4');
+insert into test.account values ('5', '367', '5');
+insert into test.account values ('6', '47658', '6');
+insert into test.account values ('7', '14', '7');
+insert into test.account values ('8', '65', '8');
+insert into test.account values ('9', '234', '9');
+insert into test.account values ('10', '786798', '10');
+insert into test.account values ('11', '432', '11');
+insert into test.account values ('12', '12', '12');
+insert into test.account values ('13', '68904', '13');
+
+
+
+
+
