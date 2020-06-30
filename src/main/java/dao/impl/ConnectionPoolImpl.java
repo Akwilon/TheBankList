@@ -8,35 +8,34 @@ import org.apache.log4j.Logger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionPoolImpl implements ConnectionPool {
     private static final Logger LOGGER = Logger.getLogger(ConnectionPoolImpl.class);
     private static volatile ConnectionPoolImpl instance;
-    private static String url = "jdbc:mysql://localhost/test?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-    private static String login = "root";
-    private static String password = "admin";
+    private String url = "jdbc:mysql://localhost/test?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+    private String login = "root";
+    private String password = "admin";
     private int startPoolSize = 5;
-    private int maxPoolSize = 10;
 
 
     private BlockingQueue<Connection> freeConnections;
     private List<Connection> allConnections;
-    private AtomicInteger currentPoolSize;
 
 
     private ConnectionPoolImpl(String url, String login, String password) throws ConnectionPoolException, InterruptedException, ClassNotFoundException {
-        ConnectionPoolImpl.url = url;
-        ConnectionPoolImpl.login = login;
-        ConnectionPoolImpl.password = password;
-        initializePool(startPoolSize, maxPoolSize);
+        this.url = url;
+        this.login = login;
+        this.password = password;
+        initializePool(startPoolSize);
+    }
+
+
+    private ConnectionPoolImpl() throws InterruptedException, ConnectionPoolException, ClassNotFoundException {
+        initializePool(startPoolSize);
     }
 
     public static ConnectionPoolImpl getInstance() throws ConnectionPoolException, InterruptedException, ClassNotFoundException {
@@ -45,7 +44,7 @@ public class ConnectionPoolImpl implements ConnectionPool {
             synchronized (ConnectionPoolImpl.class) {
                 localInstance = instance;
                 if (localInstance == null) {
-                    instance = localInstance = new ConnectionPoolImpl(url, login, password);
+                    instance = localInstance = new ConnectionPoolImpl();
                 }
             }
         }
@@ -53,32 +52,34 @@ public class ConnectionPoolImpl implements ConnectionPool {
     }
 
 
-    private Connection createConnection() throws ConnectionPoolException, ClassNotFoundException {
-        Class.forName("com.mysql.jdbc.Driver");
+    private Connection createConnection() throws ConnectionPoolException {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            LOGGER.fatal("ClassNotFoundException", e);
+        }
         try {
             Connection connection = DriverManager.getConnection(url, login, password);
             allConnections.add(connection);
             LOGGER.debug("Connection created");
             return connection;
         } catch (SQLException e) {
-            currentPoolSize.decrementAndGet();
             LOGGER.fatal("Failed to create connection", e);
             throw new ConnectionPoolException("Failed to create connection", e);
         }
     }
 
-    private void initializePool(int startPoolSize, int maxPoolSize) throws ConnectionPoolException, InterruptedException, ClassNotFoundException {
+    private void initializePool(int startPoolSize) throws ConnectionPoolException, InterruptedException {
         allConnections = new CopyOnWriteArrayList<>();
-        freeConnections = new LinkedBlockingQueue<>(maxPoolSize);
-        currentPoolSize = new AtomicInteger(startPoolSize);
+        freeConnections = new LinkedBlockingQueue<>(startPoolSize);
         for (int i = 0; i < startPoolSize; i++) {
-            Connection pooledConnection = createConnection();
-            freeConnections.put(pooledConnection);
+            Connection connection = createConnection();
+            freeConnections.put(connection);
         }
     }
 
 
-    public Connection acquireConnection() throws ConnectionPoolException, ConnectionPoolNotInitializedException, ClassNotFoundException {
+    public Connection acquireConnection() throws ConnectionPoolException, ConnectionPoolNotInitializedException {
         Connection connection = null;
         try {
             connection = freeConnections.poll();
@@ -88,9 +89,6 @@ public class ConnectionPoolImpl implements ConnectionPool {
         if (connection != null) {
             LOGGER.debug("Connection acquired");
             return connection;
-        } else if (currentPoolSize.getAndUpdate(n -> (n < maxPoolSize) ? ++n : n) < maxPoolSize) {
-            connection = createConnection();
-            return connection;
         } else {
             throw new ConnectionPoolException("Timeout exceeded while trying to acquire connection from connection pool");
         }
@@ -98,24 +96,26 @@ public class ConnectionPoolImpl implements ConnectionPool {
 
     public void releaseConnection(Connection connection) {
         try {
-            connection.close();
+            connection.clearWarnings();
+            connection.setAutoCommit(true);
             freeConnections.put(connection);
-        } catch (SQLException ex) {
-            LOGGER.warn("Connection to database was not properly closed, causing memory leak", ex);
+        } catch (SQLException e) {
+            LOGGER.error("SQLException in releaseConncetion", e);
         } catch (InterruptedException e) {
             LOGGER.error("Thread was interrupted while trying to release connection to connection pool", e);
         }
     }
 
-    public static void setUrl(String uri) {
-        ConnectionPoolImpl.url = uri;
+    public void setUrl(String uri) {
+        this.url = uri;
     }
 
-    public static void setLogin(String login1) {
-        ConnectionPoolImpl.login = login1;
+    public void setLogin(String login1) {
+        this.login = login1;
     }
 
-    public static void setPassword(String password1) {
-        ConnectionPoolImpl.password = password1;
+    public void setPassword(String password1) {
+        this.password = password1;
     }
+
 }

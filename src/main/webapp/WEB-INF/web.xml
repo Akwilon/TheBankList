@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+
+    <servlet>
+        <servlet-name>HomeJsp</servlet-name>
+        <jsp-file>/WEB-INF/view/HomeJsp.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HomeJsp</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Richest</servlet-name>
+        <jsp-file>/WEB-INF/view/Richest.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Richest</servlet-name>
+        <url-pattern>/richest</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Parametres</servlet-name>
+        <jsp-file>/WEB-INF/view/Parametres.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Parametres</servlet-name>
+        <url-pattern>/parametres</url-pattern>
+    </servlet-mapping>
+
+
+
+
+</web-app>

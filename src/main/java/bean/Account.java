@@ -1,6 +1,8 @@
 package bean;
 
-public class Account {
+import java.util.Comparator;
+
+public class Account implements Comparable<Account> {
     private int accountID;
     private int account;
     private int userID;
@@ -40,6 +42,18 @@ public class Account {
         result = 31 * result + userID;
         return result;
     }
+
+    @Override
+    public int compareTo(Account o) {
+        if (this.getAccount()==o.getAccount()){
+            return 0;
+        }
+        else if (this.getAccount()>o.getAccount()){
+            return 1;
+        }
+        else return -1;
+    }
+
 
     public int getAccountID() {
         return accountID;

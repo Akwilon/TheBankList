@@ -1,11 +1,12 @@
 package dao;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface Dao <T> {
 
-    public T getByID();
+    public Optional<T> getByID(int ID) throws ConnectionPoolException, ConnectionPoolNotInitializedException;
 
-    public List<T> getAll();
+    public List<T> getAll() throws ConnectionPoolException, ConnectionPoolNotInitializedException;
 
 }

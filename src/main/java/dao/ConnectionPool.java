@@ -8,7 +8,6 @@ public interface ConnectionPool {
 
     Connection acquireConnection() throws ConnectionPoolException, ConnectionPoolNotInitializedException, ClassNotFoundException;
 
-
     void releaseConnection(Connection connection);
 
 }
