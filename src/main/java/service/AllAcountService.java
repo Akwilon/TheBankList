@@ -28,4 +28,37 @@ public class AllAcountService {
         return res;
     }
 
+    public static Integer getRichestUserID(){
+        int ID = 0;
+        try {
+            List<Account> accountList = new AccountDao().getAll();
+            int maxValue = Integer.MIN_VALUE;
+            for (Account account : accountList) {
+                if (account.getAccount() > maxValue) {
+                    maxValue = account.getAccount();
+                    ID = account.getUserID();
+                }
+            }
+        } catch (ConnectionPoolException e) {
+            LOGGER.error("Pool was not conected:" + e);
+        } catch (ConnectionPoolNotInitializedException e) {
+            LOGGER.error("Pool was not initialized:" + e);
+        }
+        return ID;
+    }
+
+
+
+    public static Integer getSumAllAccount(){
+        Integer value = null;
+        try {
+            value = new AccountDao().getAll().stream().mapToInt(a -> a.getAccount()).sum();
+        } catch (ConnectionPoolException e) {
+            LOGGER.error("Pool was not conected:" + e);
+        } catch (ConnectionPoolNotInitializedException e) {
+            LOGGER.error("Pool was not initialized:" + e);
+        }
+        return value;
+    }
+
 }

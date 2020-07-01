@@ -6,6 +6,7 @@ import dao.ConnectionPoolException;
 import dao.ConnectionPoolNotInitializedException;
 import dao.impl.AccountDao;
 import dao.impl.UserDao;
+import service.AllAcountService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -26,17 +27,8 @@ public class SummAcountSerlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Account account = null;
-        Integer value = null;
-        try {
-//            List<Account> accountList = new AccountDao().getAll().stream().mapToInt(a-> a.getAccount()).sum();
-            value = new AccountDao().getAll().stream().mapToInt(a -> a.getAccount()).sum();
-        } catch(ConnectionPoolException | ConnectionPoolNotInitializedException e){
-            e.printStackTrace();
-        }
-        //          Integer value = new AccountDao().getAll().stream().mapToInt(a-> a.getAccount()).sum();
+        Integer value = AllAcountService.getSumAllAccount();
         req.setAttribute("value", value);
-
         doGet(req, resp);
     }
 }
